@@ -38,6 +38,16 @@ frequency_repeat = {
     "q4h": 6, "every 4 hour": 6,
 }
 
+# دالة لتحويل روابط Google Drive
+def fix_drive_url(url: str) -> str:
+    if "drive.google.com" in url and "/d/" in url:
+        try:
+            file_id = url.split("/d/")[1].split("/")[0]
+            return f"https://drive.google.com/uc?export=download&id={file_id}"
+        except:
+            return url
+    return url
+
 def process_pdf(pdf_bytes):
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
     new_doc = fitz.open()
@@ -98,7 +108,7 @@ def process_pdf(pdf_bytes):
     return output_bytes
 
 # ---------------- Streamlit واجهة ----------------
-st.title("استغفر الله العظيم واتوب اليه")
+st.title("📄 أداة تعديل ملفات PDF للأدوية")
 
 tab1, tab2 = st.tabs(["🔗 عبر رابط", "📂 رفع ملف"])
 
@@ -116,7 +126,8 @@ with tab1:
     pdf_url = st.text_input("ضع رابط ملف PDF هنا")
     if pdf_url and st.button("معالجة الرابط"):
         try:
-            response = requests.get(pdf_url)
+            fixed_url = fix_drive_url(pdf_url)
+            response = requests.get(fixed_url)
             response.raise_for_status()
             output_pdf = process_pdf(response.content)
             st.success("✅ الملف جاهز")
@@ -133,4 +144,3 @@ with tab2:
             show_pdf(output_pdf)
         except Exception as e:
             st.error(f"❌ خطأ: {e}")
-
