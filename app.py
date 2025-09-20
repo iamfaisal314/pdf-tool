@@ -98,7 +98,7 @@ def process_pdf(pdf_bytes):
     return output_bytes
 
 # ---------------- Streamlit واجهة ----------------
-st.title("📄 أداة تعديل ملفات PDF للأدوية")
+st.title("استغفر الله العظيم واتوب اليه")
 
 tab1, tab2 = st.tabs(["🔗 عبر رابط", "📂 رفع ملف"])
 
@@ -133,3 +133,4 @@ with tab2:
             show_pdf(output_pdf)
         except Exception as e:
             st.error(f"❌ خطأ: {e}")
+
