@@ -110,37 +110,25 @@ def process_pdf(pdf_bytes):
 # ---------------- Streamlit واجهة ----------------
 st.title("📄 أداة تعديل ملفات PDF للأدوية")
 
-tab1, tab2 = st.tabs(["🔗 عبر رابط", "📂 رفع ملف"])
+pdf_url = st.text_input("ضع رابط ملف PDF هنا (واضغط Enter)")
 
 def show_pdf(output_pdf):
     b64_pdf = base64.b64encode(output_pdf).decode("utf-8")
-    pdf_link = f"data:application/pdf;base64,{b64_pdf}"
-    new_tab_html = f"""
-    <a href="{pdf_link}" target="_blank" style="font-size:18px; padding:10px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
-        📄 فتح الملف في تبويب جديد
-    </a>
+    pdf_display = f"""
+    <object data="data:application/pdf;base64,{b64_pdf}" type="application/pdf" width="100%" height="800px">
+        <p>لا يمكن عرض PDF، اضغط للتنزيل:
+        <a href="data:application/pdf;base64,{b64_pdf}">تحميل الملف</a></p>
+    </object>
     """
-    st.markdown(new_tab_html, unsafe_allow_html=True)
+    st.markdown(pdf_display, unsafe_allow_html=True)
 
-with tab1:
-    pdf_url = st.text_input("ضع رابط ملف PDF هنا")
-    if pdf_url and st.button("معالجة الرابط"):
-        try:
-            fixed_url = fix_drive_url(pdf_url)
-            response = requests.get(fixed_url)
-            response.raise_for_status()
-            output_pdf = process_pdf(response.content)
-            st.success("✅ الملف جاهز")
-            show_pdf(output_pdf)
-        except Exception as e:
-            st.error(f"❌ خطأ: {e}")
-
-with tab2:
-    uploaded_file = st.file_uploader("اختر ملف PDF", type=["pdf"])
-    if uploaded_file and st.button("معالجة الملف"):
-        try:
-            output_pdf = process_pdf(uploaded_file.read())
-            st.success("✅ الملف جاهز")
-            show_pdf(output_pdf)
-        except Exception as e:
-            st.error(f"❌ خطأ: {e}")
+if pdf_url:
+    try:
+        fixed_url = fix_drive_url(pdf_url)
+        response = requests.get(fixed_url)
+        response.raise_for_status()
+        output_pdf = process_pdf(response.content)
+        st.success("✅ الملف جاهز")
+        show_pdf(output_pdf)
+    except Exception as e:
+        st.error(f"❌ خطأ: {e}")
