@@ -114,13 +114,13 @@ tab1, tab2 = st.tabs(["🔗 عبر رابط", "📂 رفع ملف"])
 
 def show_pdf(output_pdf):
     b64_pdf = base64.b64encode(output_pdf).decode("utf-8")
-    pdf_display = f"""
-    <object data="data:application/pdf;base64,{b64_pdf}" type="application/pdf" width="100%" height="800px">
-        <p>لا يمكن عرض PDF، اضغط هنا للتنزيل:
-        <a href="data:application/pdf;base64,{b64_pdf}" target="_blank">تحميل الملف</a></p>
-    </object>
+    pdf_link = f"data:application/pdf;base64,{b64_pdf}"
+    new_tab_html = f"""
+    <a href="{pdf_link}" target="_blank" style="font-size:18px; padding:10px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
+        📄 فتح الملف في تبويب جديد
+    </a>
     """
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    st.markdown(new_tab_html, unsafe_allow_html=True)
 
 with tab1:
     pdf_url = st.text_input("ضع رابط ملف PDF هنا")
