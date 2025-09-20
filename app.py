@@ -115,10 +115,12 @@ pdf_url = st.text_input("ضع رابط ملف PDF هنا (واضغط Enter)")
 def show_pdf(output_pdf):
     b64_pdf = base64.b64encode(output_pdf).decode("utf-8")
     pdf_display = f"""
-    <object data="data:application/pdf;base64,{b64_pdf}" type="application/pdf" width="100%" height="800px">
-        <p>لا يمكن عرض PDF، اضغط للتنزيل:
-        <a href="data:application/pdf;base64,{b64_pdf}">تحميل الملف</a></p>
-    </object>
+    <iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="800px"></iframe>
+    <br><br>
+    <a href="data:application/pdf;base64,{b64_pdf}" download="output.pdf"
+       style="font-size:18px; padding:8px 12px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
+       📥 تحميل الملف (في حال لم يُعرض بالأعلى)
+    </a>
     """
     st.markdown(pdf_display, unsafe_allow_html=True)
 
