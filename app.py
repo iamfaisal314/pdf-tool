@@ -41,6 +41,7 @@ frequency_repeat = {
 def process_pdf(pdf_bytes):
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
     new_doc = fitz.open()
+    found_page = False
 
     for page_num in range(len(doc)):
         page = doc[page_num]
@@ -55,7 +56,9 @@ def process_pdf(pdf_bytes):
                 divisor = div
                 break
         if not matched_drug:
-            continue  # تجاهل الصفحة
+            continue
+
+        found_page = True
 
         # تكرار الصفحة
         repeat_times = 1
@@ -86,6 +89,9 @@ def process_pdf(pdf_bytes):
                         )
                         break
 
+    if not found_page:
+        return pdf_bytes
+
     output_bytes = new_doc.write()
     new_doc.close()
     doc.close()
@@ -97,12 +103,12 @@ st.title("📄 أداة تعديل ملفات PDF للأدوية")
 tab1, tab2 = st.tabs(["🔗 عبر رابط", "📂 رفع ملف"])
 
 def show_pdf(output_pdf):
-    # تحويل PDF إلى Base64 لعرضه داخل iframe
     b64_pdf = base64.b64encode(output_pdf).decode("utf-8")
     pdf_display = f"""
-    <iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="800px" type="application/pdf"></iframe>
-    <br>
-    <button onclick="window.print()" style="padding:10px 20px;font-size:16px;margin-top:10px;">🖨️ طباعة</button>
+    <object data="data:application/pdf;base64,{b64_pdf}" type="application/pdf" width="100%" height="800px">
+        <p>لا يمكن عرض PDF، اضغط هنا للتنزيل:
+        <a href="data:application/pdf;base64,{b64_pdf}" target="_blank">تحميل الملف</a></p>
+    </object>
     """
     st.markdown(pdf_display, unsafe_allow_html=True)
 
@@ -113,7 +119,7 @@ with tab1:
             response = requests.get(pdf_url)
             response.raise_for_status()
             output_pdf = process_pdf(response.content)
-            st.success("✅ الملف جاهز للطباعة")
+            st.success("✅ الملف جاهز")
             show_pdf(output_pdf)
         except Exception as e:
             st.error(f"❌ خطأ: {e}")
@@ -123,7 +129,7 @@ with tab2:
     if uploaded_file and st.button("معالجة الملف"):
         try:
             output_pdf = process_pdf(uploaded_file.read())
-            st.success("✅ الملف جاهز للطباعة")
+            st.success("✅ الملف جاهز")
             show_pdf(output_pdf)
         except Exception as e:
             st.error(f"❌ خطأ: {e}")
